@@ -23,7 +23,23 @@ git clone
 
 ## Usage
 
-@todo
+```
+import sys
+from agent import createAgent
+
+data_files = sys.argv[2]
+
+ca = createAgent()
+
+if not data_files:
+    print("Usage: python agent.py <filename>")
+    sys.exit(0)
+    
+with open(data_files, 'r') as df:
+    data = df.readlines()
+
+ca.create_agents(data_files)
+```
 
 ## Contributions
 
