@@ -21,8 +21,8 @@ class createAgent:
         self.agent = None
 
 
-    def create_agent(self, template, name, port, blocks):
-        server = template.safe_substitute({"name":name, "port":port, 
+    def create_agent(self, template, name, blocks):
+        server = template.safe_substitute({"name":name, "port":self.port, 
                                         "blocks":blocks})
         with open(self.base_dir + "/agents/" + name + ".ck", 'w') as f:
             f.write(server)
