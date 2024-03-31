@@ -4,50 +4,61 @@ Prototype for the ChucK work.
 Simple creation of a ChucK file from a template and then run it. 
 '''
 import os
+import signal
 import subprocess
+from string import Template
 
-fh = open('template.ck', 'r')
-template = fh.read()
-fh.close()
+from agentException import agentException
 
-names = []
+class createAgent:
 
-port = 5678
+    def __init__(self, port_num) -> None:
+        fh = open('server_template.ck', 'r')
+        template = fh.read()
+        fh.close()
+        self.port = port_num
+        self.base_dir = os.getcwd()
+        self.agent = None
 
-blocks = []
 
-base_dir = os.getcwd()
-
-def create_agent(name, port, blocks):
-    server = template.format(name, port, blocks)
-    with open(base_dir + "/agents/" + name + ".ck", 'w') as f:
-        f.write(server)
-    f.closed()
-    
-def create_agents(names, port, blocks):
-    for name in names:
-        create_agent(name, port, blocks)
+    def create_agent(self, template, name, port, blocks):
+        server = template.safe_substitute({"name":name, "port":port, 
+                                        "blocks":blocks})
+        with open(self.base_dir + "/agents/" + name + ".ck", 'w') as f:
+            f.write(server)
+        f.closed()
         
+    def create_agents(self, template, dataset):
+        for name in dataset:
+            name = dataset[0]
+            blocks = dataset[1]
+            self.create_agent(template, name, self.port, blocks)
 
-def run_agents(agents=[]):
-    '''
-        Run each agent 
-        @param Agents - a defines list of agents that can be run
-    '''
-    if len(agents) ==0:
-        for name in os.listdir("agents"):
-            try:
-                agent = subprocess.run(["`which chuck` {}.ck".format(name)], shell=True, \
-                                       stderr=subprocess.PIPE, stdout= subprocess.PIPE)
-            except Exception as e:
-                print(e)
-    else:
-        for name in agents:
-                try:
-                    agent = subprocess.Popen(["`which chuck` {}.ck".format(name)], shell=True,\
-                                            stderr=subprocess.PIPE, stdout= subprocess.PIPE)
-                    agent.pid
-                except subprocess.SubprocessError as se:
-                    print(se)
-                except Exception as e:
-                    print(e)
+    def run_command(self, command_string):
+        try:
+            self.agent = subprocess.Popen(["`which chuck` {}".format(command_string)], shell=True, \
+                                        stderr=subprocess.PIPE, stdout= subprocess.PIPE)
+        except Exception as e:
+            raise agentException(e)
+
+    def run_agents(self, agents=[]):
+        '''
+            Run each agent. 
+            If not set, run all agents
+            @param agents - a defines list of agents that can be run
+        '''
+        command = ""
+        if len(agents) == 0:
+            for name in os.listdir("agents"):
+                command +=  name + ".ck "
+        else:
+            for name in agents:
+                command +=  name + ".ck "
+
+        return command
+                    
+    
+    def stop_agents(self):
+
+        self.agent.kill()
+        self.agent.wait()
