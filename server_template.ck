@@ -24,16 +24,20 @@ while (true) {
     e => now;
     while (e.nextMsg() != 0) {
         e.getString() => string op;
-        <<< "op", op >>>;
-        int snd <= checkBlock(op);
 
-        if (snd == 1) {
-            Std.fabs(Math.sin(v)) * 4000.0 => f.pfreq;
-        } else {
-            Std.fabs(Math.sin(v)) * 400.0 => f.pfreq;
+        <<< "op", op >>>;
+        if (op != name) {
+            
+            int snd <= checkBlock(op);
+
+            if (snd == 1) {
+                Std.fabs(Math.sin(v)) * 4000.0 => f.pfreq;
+            } else {
+                Std.fabs(Math.sin(v)) * 400.0 => f.pfreq;
+            }
+            osnd.startMsg("/fedi, s");
+            osnd.addString(name);
         }
-        osnd.startMsg("/fedi, s");
-        osnd.addString(name);
     }
 }
 
