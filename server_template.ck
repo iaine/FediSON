@@ -17,7 +17,7 @@ string[] blocks @=> $block
 // set equal gain zero’s
 1 => f.eqzs;
 // initialize float variable
-0.0 => float v;
+0.2 => float v;
 
 
 while (true) {
@@ -35,8 +35,10 @@ while (true) {
             } else {
                 Std.fabs(Math.sin(v)) * 400.0 => f.pfreq;
             }
+            1::second => now;
             osnd.startMsg("/fedi, s");
             osnd.addString(name);
+            
         }
     }
 }
@@ -44,7 +46,7 @@ while (true) {
 func int checkBlock(string name) {
     int blocked => 0;
     for ( 0 => int i; i < blocks.size(); i++ ) {
-        if ( name == blocked[i]) blocked => 0;
+        if ( name == blocked[i]) blocked => 1;
     }
     return blocked;
 }
