@@ -1,52 +1,43 @@
 OscRecv orec;
 OscSend osnd;
 
-Impulse i => BiQuad f => dac;
+SinOsc s => dac;
 
 
 // need to set up it on the command line    
-5005 => orec.port;
-5005 => osnd.port;
+$port => orec.port;
+osnd.setHost("localhost", $port);
+
 orec.listen();
 orec.event("/fedi, s") @=> OscEvent e;
 
-string name => "$name"
-string[] blocks @=> $block
+"$name" => string name;
+"$blocks" @=> string blocks;
 
-.99 => f.prad;
-// set equal gain zero’s
-1 => f.eqzs;
-// initialize float variable
-0.2 => float v;
-
+.15 => s.gain;
 
 while (true) {
     e => now;
     while (e.nextMsg() != 0) {
         e.getString() => string op;
-
-        <<< "op", op >>>;
+        <<< "name ", name >>>;
+        <<< "op ", op >>>;
         if (op != name) {
-            
-            int snd <= checkBlock(op);
+             <<< checkBlock(op) >>>;
 
-            if (snd == 1) {
-                Std.fabs(Math.sin(v)) * 4000.0 => f.pfreq;
+            if (checkBlock(op) != Std.atoi("-1")) {
+                245.32 => s.freq;
             } else {
-                Std.fabs(Math.sin(v)) * 400.0 => f.pfreq;
+                60.00 => s.freq;
             }
             1::second => now;
             osnd.startMsg("/fedi, s");
             osnd.addString(name);
-            
         }
     }
 }
 
-func int checkBlock(string name) {
-    int blocked => 0;
-    for ( 0 => int i; i < blocks.size(); i++ ) {
-        if ( name == blocked[i]) blocked => 1;
-    }
-    return blocked;
+// find the name. If -1 fail, else
+fun int checkBlock(string name) {
+    return blocks.find(name + ",");
 }
