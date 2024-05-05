@@ -38,16 +38,16 @@ class Server():
 
 class Client():
 
-    def __init__(self, port) -> None:
-        self.host = '127.0.0.1'
+    def __init__(self, host, port) -> None:
+        self.host = host
         self.port = port
 
-    def send(self, message):
+    def send(self, channel, message):
         '''
            Function to send the message
         '''
         try:
             client = udp_client.SimpleUDPClient(self.host, self.port)
-            client.send_message("/fedi", message)
+            client.send_message("/{}".format(channel), message)
         except Exception as e:
             print("Client Exception {}".format(e))
