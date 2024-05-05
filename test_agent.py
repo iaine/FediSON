@@ -13,7 +13,7 @@ def test_file_creation():
     with open(os.getcwd() + '/agents/' + name + '.ck', 'r') as fh:
         data = fh.read()
     assert("int port <= " + port in data)
-    assert("stirng name <= " + name in data)
+    assert("string name <= " + name in data)
     os.remove(os.getcwd() + '/agents/' + name + '.ck')
 
 def test_two_file_creation():
