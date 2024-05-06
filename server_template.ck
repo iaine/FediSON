@@ -14,23 +14,27 @@ orec.event("/fedi, s") @=> OscEvent e;
 "$name" => string name;
 "$blocks" @=> string blocks;
 
-.15 => s.gain;
+
 
 while (true) {
     e => now;
     while (e.nextMsg() != 0) {
         e.getString() => string op;
-        <<< "name ", name >>>;
-        <<< "op ", op >>>;
         if (op != name) {
              <<< checkBlock(op) >>>;
 
             if (checkBlock(op) != Std.atoi("-1")) {
+                <<< "name ", name >>>;
+                <<< "op ", op >>>;
                 245.32 => s.freq;
+                .2 => s.gain;
             } else {
-                60.00 => s.freq;
+                120.00 => s.freq;
+                .25 => s.gain;
             }
-            1::second => now;
+            0.2::second => now;
+            0.0 => s.freq;
+            0.2::second => now;
             osnd.startMsg("/fedi, s");
             osnd.addString(name);
         }
